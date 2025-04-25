@@ -5,9 +5,15 @@ import com.example.esportsapi.model.Match;
 import com.example.esportsapi.model.Team;
 import com.example.esportsapi.model.Tournament;
 import com.example.esportsapi.service.EsportsService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -20,8 +26,41 @@ public class EsportsController {
         this.esportsService = esportsService;
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        try {
+            URI uri = UriComponentsBuilder.fromHttpUrl("https://esports.sportdevs.com")
+                    .path("/classes")
+                    .build()
+                    .toUri();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer X__Ysp5du0KUrl6s-R4-bg");
+
+            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, uri);
+            ResponseEntity<String> response = new RestTemplate().exchange(requestEntity, String.class);
+
+            return ResponseEntity.ok("✅ API ответил: " + response.getStatusCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("❌ Ошибка при обращении к внешнему API: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/")
+    public String index() {
+        return "✅ Esports API is running!";
+    }
+
     @GetMapping("/games")
     public ResponseEntity<List<Game>> getAllGames() {
+        try {
+            List<Game> games = esportsService.getAllGames();
+            return ResponseEntity.ok(games);
+        } catch (Exception e) {
+            e.printStackTrace(); // или логгер
+            System.out.println(ResponseEntity.status(500).body("Error: " + e.getMessage()));
+        }
         return ResponseEntity.ok(esportsService.getAllGames());
     }
 
