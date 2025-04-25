@@ -2,7 +2,7 @@
 FROM gradle:7.4.2-jdk11 AS build
 WORKDIR /app
 COPY . .
-RUN gradle build --no-daemon -x test
+RUN gradle bootJar --no-daemon
 
 # ===== STAGE 2: RUNTIME =====
 FROM openjdk:11-jre-slim
